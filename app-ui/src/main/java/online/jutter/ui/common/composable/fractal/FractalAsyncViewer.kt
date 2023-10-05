@@ -24,7 +24,7 @@ class FractalAsyncViewer(
 
     private var sectorIterations = 10
     private var iterations: Int = 350
-    val BAILOUT = BigDecimal(16)
+    val BAILOUT = BigDecimal(9)
 
     // Начальная позиция
     // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
