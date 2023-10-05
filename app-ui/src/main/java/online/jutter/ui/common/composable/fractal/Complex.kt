@@ -1,16 +1,23 @@
 package online.jutter.ui.common.composable.fractal
 
+import java.math.BigDecimal
+import java.math.RoundingMode
+
 /**
  * Косплексное число.
  *
  * Математические операции для работы с комплексными числами.
  */
 class Complex(
-    private var real: Double,
-    private var imag: Double,
+    private var real: BigDecimal,
+    private var imag: BigDecimal,
 ) {
 
-    constructor(real: Int, imag: Int) : this(real.toDouble(), imag.toDouble())
+    companion object {
+        const val COMPLEX_SCALE = 200
+    }
+
+    constructor(real: Int, imag: Int) : this(real = BigDecimal(real), imag = BigDecimal(imag))
 
     /**
      * Получение реальной части комплексного числа
@@ -58,8 +65,8 @@ class Complex(
         val real = real
         val imag = imag
 
-        this.real = real * real - imag * imag
-        this.imag = 2 * imag * real
+        this.real = (real * real - imag * imag).setScale(COMPLEX_SCALE, RoundingMode.HALF_EVEN)
+        this.imag = (BigDecimal(2) * imag * real).setScale(COMPLEX_SCALE, RoundingMode.HALF_EVEN)
         return this
     }
 

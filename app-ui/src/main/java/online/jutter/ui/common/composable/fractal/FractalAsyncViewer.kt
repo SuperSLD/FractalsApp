@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import online.jutter.ui.ext.launchIO
 import online.jutter.ui.ext.logDebug
 import online.jutter.ui.ext.withUI
+import java.math.BigDecimal
 import kotlin.math.sqrt
 
 class FractalAsyncViewer(
@@ -23,14 +24,18 @@ class FractalAsyncViewer(
 
     private var sectorIterations = 10
     private var iterations: Int = 350
+    val BAILOUT = BigDecimal(16)
 
     // Начальная позиция
     // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
     // Позиция максимального зума (до фиксов)
-    // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
-    private var centerX: Double = -0.18085957612789928983002063068
-    private var centerY: Double = 0.664665750071544099974979619161
-    private var scale = 0.000002
+    // [x: -1.7587416850187034, y: -0.018953067896636776, scale: 1.2182379945174674E-17]
+    private var centerX = BigDecimal(-0.4857724165499294)
+    private var centerY = BigDecimal(-0.04209991654388896)
+    private var scale = BigDecimal(0.002696652170084606)
+//    private var centerX: BigDecimal = BigDecimal(-1.7587416850187034)
+//    private var centerY: BigDecimal = BigDecimal(-0.018953067896636776)
+//    private var scale = BigDecimal(1.2182379945174674E-17)
     //private var scale = 0.0002
 
     private var updateImageJob: Job? = null
@@ -39,7 +44,7 @@ class FractalAsyncViewer(
     private var iterationsCountForProgress: Long = 0
     private var currentIterationsCount: Long = 0
 
-    private var gradient = GradientFractalysis
+    private var gradient = GradientDeepSpace
 
     init {
         for (level in sectorIterations downTo 1) {
@@ -48,9 +53,9 @@ class FractalAsyncViewer(
     }
 
     fun transform(zoomChange: Float, offsetChange: Offset) {
-        scale /= zoomChange
-        centerX -= offsetChange.x * scale
-        centerY -= offsetChange.y * scale
+        scale /= BigDecimal(zoomChange.toDouble())
+        centerX -= BigDecimal(offsetChange.x.toDouble()) * scale
+        centerY -= BigDecimal(offsetChange.y.toDouble()) * scale
         updateImage()
     }
 
@@ -82,7 +87,7 @@ class FractalAsyncViewer(
             for (level in sectorIterations downTo 1) {
                 drawLevel(canvas, paint, level)
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
-                logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec.")
+                logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms.")
                 withUI {
                     onImageUpdated?.invoke(fractalOutput)
                 }
@@ -91,19 +96,22 @@ class FractalAsyncViewer(
 //            drawLevel(canvas, paint, sectorIterations)
 //            fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
 //            withUI {
-//                onImageUpdated(fractalOutput)
+//                onImageUpdated?.invoke(fractalOutput)
 //            }
-            logDebug(FRACTAL_VIEWER_LOG,"Full render time: ${(System.currentTimeMillis() - startTime)/1000} sec. [x: $centerX, y: $centerY, scale: $scale]")
+            logDebug(FRACTAL_VIEWER_LOG,"Full render time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms. [x: $centerX, y: $centerY, scale: $scale]")
         }
     }
 
     private suspend fun drawLevel(canvas: Canvas, paint: Paint, level: Int) {
         for (x in 0..width / level) {
             for (y in 0..height / level) {
+                if (y == 112) {
+                    logDebug("", "")
+                }
                 val intensity = calcPixelIntensity(
                     Complex(
-                        (x * (level) - width / 2F) * scale + centerX,
-                        (y * (level) - height / 2F) * scale + centerY,
+                        BigDecimal(x * (level) - width / 2.0) * scale + centerX,
+                        BigDecimal(y * (level) - height / 2.0) * scale + centerY,
                     )
                 )
                 paint.color = calcPixelColor(intensity)
@@ -124,9 +132,7 @@ class FractalAsyncViewer(
         for (i in 0 until iterations) {
             // z(n+1) = z(n)*z(n) + c
             z = z.square() + c
-            if (sqrt(z.real() * z.real() + z.imag() + z.imag()) > 3) {
-                return i / iterations.toFloat()
-            }
+            if (z.real()*z.real() + z.imag()*z.imag() > BAILOUT) return i/iterations.toFloat()
         }
         return 0F
     }
@@ -135,5 +141,4 @@ class FractalAsyncViewer(
         return gradient.getColor(intensity)
     }
 }
-
 const val FRACTAL_VIEWER_LOG = "FractalAsyncViewer"
