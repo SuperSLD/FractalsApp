@@ -84,8 +84,8 @@ class FractalAsyncViewer(
             val paint = Paint()
 
             val startTime = System.currentTimeMillis()
-            for (level in sectorIterations downTo 1) {
-                drawLevel(canvas, paint, level)
+            for (level in sectorIterations + 1 downTo 1) {
+                drawLevel(canvas, paint, if (sectorIterations + 1 == level) 70 else level)
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
                 logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms.")
                 withUI {
