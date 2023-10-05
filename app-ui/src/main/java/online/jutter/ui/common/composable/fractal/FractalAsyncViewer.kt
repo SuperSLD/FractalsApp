@@ -28,9 +28,9 @@ class FractalAsyncViewer(
     // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
     // Позиция максимального зума (до фиксов)
     // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
-    private var centerX: Double = -0.18085957612789928983002063068
-    private var centerY: Double = 0.664665750071544099974979619161
-    private var scale = 0.000002
+    private var centerX: Double = -0.4857724165499294
+    private var centerY: Double = -0.04209991654388896
+    private var scale = 0.002696652170084606
     //private var scale = 0.0002
 
     private var updateImageJob: Job? = null
@@ -42,8 +42,8 @@ class FractalAsyncViewer(
     private var gradient = GradientFractalysis
 
     init {
-        for (level in sectorIterations downTo 1) {
-            iterationsCountForProgress += (width / level) + 1
+        for (level in sectorIterations + 1 downTo 1) {
+            iterationsCountForProgress += (width / (if (level == sectorIterations + 1) 50 else level)) + 1
         }
     }
 
@@ -79,8 +79,8 @@ class FractalAsyncViewer(
             val paint = Paint()
 
             val startTime = System.currentTimeMillis()
-            for (level in sectorIterations downTo 1) {
-                drawLevel(canvas, paint, level)
+            for (level in sectorIterations + 1 downTo 1) {
+                drawLevel(canvas, paint, if (level == sectorIterations + 1) 50 else level)
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
                 logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec.")
                 withUI {
