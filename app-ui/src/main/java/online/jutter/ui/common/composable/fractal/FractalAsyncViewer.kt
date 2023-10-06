@@ -23,16 +23,18 @@ class FractalAsyncViewer(
     private var fractalOutput = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     //private var fractalFunction = (, x)
 
-    private var sectorIterations = 7
-    private var iterations: Int = 350
+    private var sectorIterations = listOf(7, 5, 1)
+    private var iterations: Int = START_ITERATIONS
 
     // Начальная позиция
     // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
     // Позиция максимального зума (до фиксов)
     // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
-    private var centerX = BigDecimal(-0.4857724165499294)
-    private var centerY = BigDecimal(-0.04209991654388896)
-    private var scale = BigDecimal(0.002696652170084606)
+    // Красивая загагулина
+    // [x: -0.2343347114572282, y: 0.8271799783391012, scale: 1.482389478882432E-9]
+    private var centerX = BigDecimal(-0.2343347114572282)
+    private var centerY = BigDecimal(0.8271799783391012)
+    private var scale = BigDecimal(1.482389478882432E-9)
     //private var scale = 0.0002
 
     private var updateImageJob: Job? = null
@@ -42,14 +44,14 @@ class FractalAsyncViewer(
     private var currentIterationsCount: Long = 0
     private var startTime = 0L
 
-    private var gradient = GradientDeepSpace
+    private var gradient = GradientFractalysis
 
     private var midLIterations = 0L
     private var midIterationsCount = 0L
 
     init {
-        for (level in sectorIterations downTo 1) {
-            iterationsCountForProgress += (width / 2.0.pow(level).toInt()) + 1
+        sectorIterations.forEach {
+            iterationsCountForProgress += (width / 2.0.pow(it).toInt()) + 1
         }
     }
 
@@ -87,16 +89,15 @@ class FractalAsyncViewer(
             val paint = Paint()
 
             startTime = System.currentTimeMillis()
-            for (level in sectorIterations downTo 1) {
-                drawLevel(canvas, paint, 2.0.pow(level).toInt())
-                if (midLIterations / midIterationsCount / iterations.toFloat() != 0.05F && level > sectorIterations / 2) {
+            sectorIterations.forEach {
+                drawLevel(canvas, paint, 2.0.pow(it).toInt())
+                if (midLIterations / midIterationsCount / iterations.toFloat() != 0.05F) {
                     val iterations = ((midLIterations / midIterationsCount) * 5F).toInt()
                     if (iterations < 350) this.iterations = 350 else this.iterations = iterations
                 }
-                fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
-                logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms.")
+                logDebug(FRACTAL_VIEWER_LOG,"Render level $it time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms.")
                 withUI {
-                    onImageUpdated?.invoke(fractalOutput)
+                    onImageUpdated?.invoke(fractal)
                 }
             }
 
@@ -136,7 +137,7 @@ class FractalAsyncViewer(
             if (z.real() * z.real() + z.imag() * z.imag() > BigDecimal(9)) {
                 midLIterations += i
                 midIterationsCount += 1
-                return i / iterations.toFloat()
+                return i / START_ITERATIONS.toFloat()
             }
         }
         return 0F
@@ -147,4 +148,5 @@ class FractalAsyncViewer(
     }
 }
 
+const val START_ITERATIONS = 350
 const val FRACTAL_VIEWER_LOG = "FractalAsyncViewer"

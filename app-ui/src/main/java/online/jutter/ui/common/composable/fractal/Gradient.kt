@@ -13,9 +13,9 @@ data class Gradient(
      * Получение цвета в соответствии с интенсивностью точки на экране.
      */
     fun getColor(percent: Float): Int {
-        val localPercent = percent * (colors.size - 1) - (percent * (colors.size - 1)).toInt()
-        val firstColor = colors[(percent * (colors.size - 1)).toInt()]
-        val secondColor = colors[(percent * (colors.size - 1)).toInt() + 1]
+        val localPercent = percent % 1F * (colors.size - 1) - (percent % 1F * (colors.size - 1)).toInt()
+        val firstColor = colors[(percent % 1F * (colors.size - 1)).toInt()]
+        val secondColor = colors[(percent % 1F * (colors.size - 1)).toInt() + 1]
 
         val resultRed = firstColor.r + localPercent * (secondColor.r - firstColor.r)
         val resultGreen = firstColor.g + localPercent * (secondColor.g - firstColor.g)

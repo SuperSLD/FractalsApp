@@ -39,7 +39,7 @@ fun Fractal(
     val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
         if (!transition) {
             transition = true
-            lastFractalBitmap = fractalBitmap?.copy(Bitmap.Config.ARGB_8888, false)
+            //lastFractalBitmap = fractalBitmap?.copy(Bitmap.Config.ARGB_8888, false)
             offset = Offset(0F, 0F)
             scale = 1f
         }
@@ -77,7 +77,7 @@ fun Fractal(
             )
         } else {
             BitmapImage(
-                bitmap = lastFractalBitmap,
+                bitmap = fractalBitmap,
                 modifier = Modifier
                     .fillMaxSize()
                     .graphicsLayer(
