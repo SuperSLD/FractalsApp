@@ -30,9 +30,9 @@ class FractalAsyncViewer(
     // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
     // Позиция максимального зума (до фиксов)
     // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
-    private var centerX: Double = -0.4857724165499294
-    private var centerY: Double = -0.04209991654388896
-    private var scale = 0.002696652170084606
+    private var centerX = BigDecimal(-0.4857724165499294)
+    private var centerY = BigDecimal(-0.04209991654388896)
+    private var scale = BigDecimal(0.002696652170084606)
     //private var scale = 0.0002
 
     private var updateImageJob: Job? = null
