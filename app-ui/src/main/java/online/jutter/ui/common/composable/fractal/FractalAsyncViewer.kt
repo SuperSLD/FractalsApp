@@ -34,10 +34,9 @@ class FractalAsyncViewer(
     // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
     // Красивая загагулина
     // [x: -0.2343347114572282, y: 0.8271799783391012, scale: 1.482389478882432E-9]
-    private var centerX = -0.2343347114572282
-    private var centerY = 0.8271799783391012
-    private var scale = 1.482389478882432E-9
-    //private var scale = 0.0002
+    private var centerX = -0.4857724165499294
+    private var centerY = -0.04209991654388896
+    private var scale = 0.002696652170084606
 
     private var updateImageJob: Job? = null
     private var onImageUpdated: ((Bitmap) -> Unit)? = null
