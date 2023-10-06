@@ -19,6 +19,8 @@ import online.jutter.ui.common.composable.fractal.GradientBlue
 import online.jutter.ui.common.composable.fractal.GradientBlueGreen
 import online.jutter.ui.common.composable.fractal.GradientDeepSpace
 import online.jutter.ui.common.composable.fractal.GradientFractalysis
+import online.jutter.ui.common.composable.fractal.GradientRainbow
+import online.jutter.ui.common.composable.fractal.RgbColor
 import online.jutter.ui.theme.FractalsTheme
 
 @Composable
@@ -67,6 +69,10 @@ fun DefaultPreview() {
             )
             GradientPreview(
                 GradientDeepSpace,
+                200,
+            )
+            GradientPreview(
+                GradientRainbow,
                 200,
             )
         }

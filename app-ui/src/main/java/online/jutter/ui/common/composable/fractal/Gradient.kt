@@ -72,3 +72,13 @@ val GradientDeepSpace = Gradient(
         RgbColor(255, 174, 174),
     )
 )
+
+val GradientRainbow = Gradient(
+    listOf(
+        RgbColor(0, 0, 0),
+        RgbColor(0, 0, 255),
+        RgbColor(0, 255, 255),
+        RgbColor(255, 150, 0),
+        RgbColor(0, 0, 0),
+    )
+)

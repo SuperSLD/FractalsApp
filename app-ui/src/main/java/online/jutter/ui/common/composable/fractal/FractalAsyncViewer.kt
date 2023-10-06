@@ -42,7 +42,7 @@ class FractalAsyncViewer(
     private var currentIterationsCount: Long = 0
     private var startTime = 0L
 
-    private var gradient = GradientDeepSpace
+    private var gradient = GradientRainbow
 
     init {
         for (level in sectorIterations downTo 1) {
