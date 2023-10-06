@@ -17,6 +17,12 @@ import kotlin.math.sqrt
 class FractalAsyncViewer(
     private val width: Int,
     private val height: Int,
+
+    private var centerX: Double = -0.4857724165499294,
+    private var centerY: Double = -0.04209991654388896,
+    private var scale: Double = 0.002696652170084606,
+
+    private var gradient: Gradient = GradientBlueGreen,
 ) {
 
     private var fractal = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
@@ -34,9 +40,7 @@ class FractalAsyncViewer(
     // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
     // Красивая загагулина
     // [x: -0.2343347114572282, y: 0.8271799783391012, scale: 1.482389478882432E-9]
-    private var centerX = -0.4857724165499294
-    private var centerY = -0.04209991654388896
-    private var scale = 0.002696652170084606
+
 
     private var updateImageJob: Job? = null
     private var onImageUpdated: ((Bitmap) -> Unit)? = null
@@ -45,8 +49,6 @@ class FractalAsyncViewer(
     private var currentIterationsCount: Long = 0
     private var startTime = 0L
     private val pixelRenderJobs = mutableListOf<Job>()
-
-    private var gradient = GradientBlueGreen
 
     private var midLIterations = 0L
     private var midIterationsCount = 0L
