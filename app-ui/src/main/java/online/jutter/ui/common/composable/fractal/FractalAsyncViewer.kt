@@ -100,11 +100,6 @@ class FractalAsyncViewer(
                 }
             }
 
-//            drawLevel(canvas, paint, sectorIterations)
-//            fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
-//            withUI {
-//                onImageUpdated?.invoke(fractalOutput)
-//            }
             logDebug(FRACTAL_VIEWER_LOG,"Full render time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms. [x: $centerX, y: $centerY, scale: $scale]")
         }
     }
