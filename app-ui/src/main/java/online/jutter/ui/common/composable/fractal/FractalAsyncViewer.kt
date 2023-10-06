@@ -69,7 +69,7 @@ class FractalAsyncViewer(
         onProgressUpdate?.invoke(
             (currentIterationsCount / iterationsCountForProgress.toFloat() * 10000).toInt() / 100F,
             time,
-            midLIterations / midIterationsCount,
+            iterations.toLong(),
         )
     }
 
@@ -89,8 +89,9 @@ class FractalAsyncViewer(
             startTime = System.currentTimeMillis()
             for (level in sectorIterations downTo 1) {
                 drawLevel(canvas, paint, 2.0.pow(level).toInt())
-                if (midLIterations / midIterationsCount / iterations.toFloat() != 0.1F) {
-                    iterations = ((midLIterations / midIterationsCount) * 10F).toInt()
+                if (midLIterations / midIterationsCount / iterations.toFloat() != 0.05F && level > sectorIterations / 2) {
+                    val iterations = ((midLIterations / midIterationsCount) * 5F).toInt()
+                    if (iterations < 350) this.iterations = 350 else this.iterations = iterations
                 }
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
                 logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms.")
@@ -109,8 +110,8 @@ class FractalAsyncViewer(
     }
 
     private suspend fun drawLevel(canvas: Canvas, paint: Paint, level: Int) {
-        midLIterations = 0L
-        midIterationsCount = 0L
+        midLIterations = 35L
+        midIterationsCount = 1L
         for (x in 0..width / level) {
             for (y in 0..height / level) {
                 val intensity = calcPixelIntensity(
