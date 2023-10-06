@@ -25,7 +25,7 @@ import online.jutter.ui.theme.FractalsTheme
 @Composable
 fun Fractal(
     iterations: Int = 100,
-    onProgressUpdate: ((Float, Long) -> Unit)? = null
+    onProgressUpdate: ((Float, Long, Long) -> Unit)? = null
 ) {
 
     var fractalBitmap by remember { mutableStateOf<Bitmap?>(null) }

@@ -37,12 +37,15 @@ class FractalAsyncViewer(
 
     private var updateImageJob: Job? = null
     private var onImageUpdated: ((Bitmap) -> Unit)? = null
-    private var onProgressUpdate: ((Float, Long) -> Unit)? = null
+    private var onProgressUpdate: ((Float, Long, Long) -> Unit)? = null
     private var iterationsCountForProgress: Long = 0
     private var currentIterationsCount: Long = 0
     private var startTime = 0L
 
-    private var gradient = GradientRainbow
+    private var gradient = GradientDeepSpace
+
+    private var midLIterations = 0L
+    private var midIterationsCount = 0L
 
     init {
         for (level in sectorIterations downTo 1) {
@@ -57,7 +60,7 @@ class FractalAsyncViewer(
         updateImage()
     }
 
-    fun onProgressUpdate(callback: ((Float, Long) -> Unit)?) {
+    fun onProgressUpdate(callback: ((Float, Long, Long) -> Unit)?) {
         onProgressUpdate = callback
     }
 
@@ -66,6 +69,7 @@ class FractalAsyncViewer(
         onProgressUpdate?.invoke(
             (currentIterationsCount / iterationsCountForProgress.toFloat() * 10000).toInt() / 100F,
             time,
+            midLIterations / midIterationsCount,
         )
     }
 
@@ -85,6 +89,9 @@ class FractalAsyncViewer(
             startTime = System.currentTimeMillis()
             for (level in sectorIterations downTo 1) {
                 drawLevel(canvas, paint, 2.0.pow(level).toInt())
+                if (midLIterations / midIterationsCount / iterations.toFloat() != 0.1F) {
+                    iterations = ((midLIterations / midIterationsCount) * 10F).toInt()
+                }
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
                 logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec. ${(System.currentTimeMillis() - startTime)%1000} ms.")
                 withUI {
@@ -102,6 +109,8 @@ class FractalAsyncViewer(
     }
 
     private suspend fun drawLevel(canvas: Canvas, paint: Paint, level: Int) {
+        midLIterations = 0L
+        midIterationsCount = 0L
         for (x in 0..width / level) {
             for (y in 0..height / level) {
                 val intensity = calcPixelIntensity(
@@ -129,6 +138,8 @@ class FractalAsyncViewer(
             // z(n+1) = z(n)*z(n) + c
             z = z.square() + c
             if (z.real() * z.real() + z.imag() * z.imag() > BigDecimal(9)) {
+                midLIterations += i
+                midIterationsCount += 1
                 return i / iterations.toFloat()
             }
         }

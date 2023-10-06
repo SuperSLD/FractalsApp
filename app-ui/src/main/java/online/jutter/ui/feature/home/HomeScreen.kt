@@ -50,6 +50,9 @@ fun HomeScreen(
     var time by remember {
         mutableLongStateOf(0L)
     }
+    var midIterations by remember {
+        mutableLongStateOf(0L)
+    }
 
     Scaffold { innerPadding ->
         val contentModifier = Modifier
@@ -58,16 +61,17 @@ fun HomeScreen(
         if (state.isLoading) {
             LoadingBar()
         } else {
-            Fractal(onProgressUpdate = { p, t ->
+            Fractal(onProgressUpdate = { p, t, m ->
                 progress = p
                 time = t
+                midIterations = m
             })
             Box(
                 modifier = Modifier.fillMaxSize()
                     .padding(16.dp),
             ) {
                 Text(
-                    text = "Loading: $progress%, ${time/1000} sec. ${time % 1000} ms.",
+                    text = "Loading: $progress%, ${time/1000} sec. ${time % 1000} ms, mid iter $midIterations",
                     color = Color.White,
                 )
             }
