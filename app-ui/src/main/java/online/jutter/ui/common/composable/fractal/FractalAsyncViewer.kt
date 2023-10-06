@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import online.jutter.ui.ext.launchIO
 import online.jutter.ui.ext.logDebug
 import online.jutter.ui.ext.withUI
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 class FractalAsyncViewer(
@@ -21,7 +22,7 @@ class FractalAsyncViewer(
     private var fractalOutput = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     //private var fractalFunction = (, x)
 
-    private var sectorIterations = 10
+    private var sectorIterations = 7
     private var iterations: Int = 350
 
     // Начальная позиция
@@ -42,8 +43,8 @@ class FractalAsyncViewer(
     private var gradient = GradientFractalysis
 
     init {
-        for (level in sectorIterations + 1 downTo 1) {
-            iterationsCountForProgress += (width / (if (level == sectorIterations + 1) 50 else level)) + 1
+        for (level in sectorIterations downTo 1) {
+            iterationsCountForProgress += (width / 2.0.pow(level).toInt()) + 1
         }
     }
 
@@ -79,8 +80,8 @@ class FractalAsyncViewer(
             val paint = Paint()
 
             val startTime = System.currentTimeMillis()
-            for (level in sectorIterations + 1 downTo 1) {
-                drawLevel(canvas, paint, if (level == sectorIterations + 1) 50 else level)
+            for (level in sectorIterations downTo 1) {
+                drawLevel(canvas, paint, 2.0.pow(level).toInt())
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
                 logDebug(FRACTAL_VIEWER_LOG,"Render level $level time: ${(System.currentTimeMillis() - startTime)/1000} sec.")
                 withUI {
@@ -124,7 +125,7 @@ class FractalAsyncViewer(
         for (i in 0 until iterations) {
             // z(n+1) = z(n)*z(n) + c
             z = z.square() + c
-            if (sqrt(z.real() * z.real() + z.imag() + z.imag()) > 3) {
+            if (z.real() * z.real() + z.imag() * z.imag() > 9) {
                 return i / iterations.toFloat()
             }
         }
