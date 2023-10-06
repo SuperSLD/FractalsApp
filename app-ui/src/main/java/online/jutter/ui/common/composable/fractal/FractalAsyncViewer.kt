@@ -23,8 +23,10 @@ class FractalAsyncViewer(
     private var fractalOutput = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     //private var fractalFunction = (, x)
 
-    private var sectorIterations = listOf(7, 5, 1)
+    private var sectorIterations = listOf(7, 5, 3, 2, 1)
     private var iterations: Int = START_ITERATIONS
+
+    private val runtime = Runtime.getRuntime()
 
     // Начальная позиция
     // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
@@ -32,9 +34,9 @@ class FractalAsyncViewer(
     // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
     // Красивая загагулина
     // [x: -0.2343347114572282, y: 0.8271799783391012, scale: 1.482389478882432E-9]
-    private var centerX = BigDecimal(-0.2343347114572282)
-    private var centerY = BigDecimal(0.8271799783391012)
-    private var scale = BigDecimal(1.482389478882432E-9)
+    private var centerX = -0.2343347114572282
+    private var centerY = 0.8271799783391012
+    private var scale = 1.482389478882432E-9
     //private var scale = 0.0002
 
     private var updateImageJob: Job? = null
@@ -43,8 +45,9 @@ class FractalAsyncViewer(
     private var iterationsCountForProgress: Long = 0
     private var currentIterationsCount: Long = 0
     private var startTime = 0L
+    private val pixelRenderJobs = mutableListOf<Job>()
 
-    private var gradient = GradientFractalysis
+    private var gradient = GradientBlueGreen
 
     private var midLIterations = 0L
     private var midIterationsCount = 0L
@@ -56,9 +59,9 @@ class FractalAsyncViewer(
     }
 
     fun transform(zoomChange: Float, offsetChange: Offset) {
-        scale /= BigDecimal(zoomChange.toDouble())
-        centerX -= BigDecimal(offsetChange.x.toDouble()) * scale
-        centerY -= BigDecimal(offsetChange.y.toDouble()) * scale
+        scale /= zoomChange.toDouble()
+        centerX -= offsetChange.x.toDouble() * scale
+        centerY -= offsetChange.y.toDouble() * scale
         updateImage()
     }
 
@@ -84,6 +87,7 @@ class FractalAsyncViewer(
         logDebug(FRACTAL_VIEWER_LOG,"Start updating image")
         currentIterationsCount = 0
         updateImageJob?.cancel()
+        pixelRenderJobs.clear()
         updateImageJob = GlobalScope.launchIO {
             val canvas = Canvas(fractal)
             val paint = Paint()
@@ -110,20 +114,23 @@ class FractalAsyncViewer(
         midIterationsCount = 1L
         for (x in 0..width / level) {
             for (y in 0..height / level) {
-                val intensity = calcPixelIntensity(
-                    Complex(
-                        BigDecimal(x * (level) - width / 2.0) * scale + centerX,
-                        BigDecimal(y * (level) - height / 2.0) * scale + centerY,
+                val job = GlobalScope.launchIO {
+                    val intensity = calcPixelIntensity(
+                        Complex(
+                            (x * (level) - width / 2.0) * scale + centerX,
+                            (y * (level) - height / 2.0) * scale + centerY,
+                        )
                     )
-                )
-                paint.color = calcPixelColor(intensity)
-                canvas.drawRect(
-                    x.toFloat() * (level),
-                    y.toFloat() * (level),
-                    x.toFloat() * (level) + level,
-                    y.toFloat() * (level) + level,
-                    paint,
-                )
+                    paint.color = calcPixelColor(intensity)
+                    canvas.drawRect(
+                        x.toFloat() * (level),
+                        y.toFloat() * (level),
+                        x.toFloat() * (level) + level,
+                        y.toFloat() * (level) + level,
+                        paint,
+                    )
+                }
+                pixelRenderJobs.add(job)
             }
             withUI { updateProgress(System.currentTimeMillis() - startTime) }
         }
@@ -134,7 +141,7 @@ class FractalAsyncViewer(
         for (i in 0 until iterations) {
             // z(n+1) = z(n)*z(n) + c
             z = z.square() + c
-            if (z.real() * z.real() + z.imag() * z.imag() > BigDecimal(9)) {
+            if ((z.real() * z.real() + z.imag() * z.imag()) > 9.0) {
                 midLIterations += i
                 midIterationsCount += 1
                 return i / START_ITERATIONS.toFloat()

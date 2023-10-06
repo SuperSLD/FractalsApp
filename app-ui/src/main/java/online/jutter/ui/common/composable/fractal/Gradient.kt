@@ -40,6 +40,7 @@ val GradientBlue = Gradient(
     listOf(
         RgbColor(0F, 0F, 0F),
         RgbColor(0F, 0F, 1F),
+        RgbColor(0F, 0F, 0F),
     )
 )
 
@@ -48,8 +49,23 @@ val GradientBlueGreen = Gradient(
         RgbColor(0F, 0F, 0F),
         RgbColor(0F, 0F, 1F),
         RgbColor(0F, 1F, 1F),
+        RgbColor(0F, 0F, 1F),
+        RgbColor(0F, 0F, 0F),
     )
 )
+
+val GradientBlueRedGreen = Gradient(
+    listOf(
+        RgbColor(0F, 0F, 0F),
+        RgbColor(0F, 0F, 1F),
+        RgbColor(1F, 0F, 1F),
+        RgbColor(0F, 1F, 1F),
+        RgbColor(1F, 0F, 1F),
+        RgbColor(0F, 0F, 1F),
+        RgbColor(0F, 0F, 0F),
+    )
+)
+
 
 val GradientFractalysis = Gradient(
     listOf(
@@ -70,6 +86,7 @@ val GradientDeepSpace = Gradient(
         RgbColor(0, 176, 200),
         RgbColor(109, 90, 211),
         RgbColor(255, 174, 174),
+        RgbColor(0, 0, 0),
     )
 )
 
