@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -46,6 +47,9 @@ fun HomeScreen(
     var progress by remember {
         mutableFloatStateOf(0F)
     }
+    var time by remember {
+        mutableLongStateOf(0L)
+    }
 
     Scaffold { innerPadding ->
         val contentModifier = Modifier
@@ -54,13 +58,16 @@ fun HomeScreen(
         if (state.isLoading) {
             LoadingBar()
         } else {
-            Fractal(onProgressUpdate = { progress = it })
+            Fractal(onProgressUpdate = { p, t ->
+                progress = p
+                time = t
+            })
             Box(
                 modifier = Modifier.fillMaxSize()
                     .padding(16.dp),
             ) {
                 Text(
-                    text = "Loading: $progress%",
+                    text = "Loading: $progress%, ${time/1000} sec. ${time % 1000} ms.",
                     color = Color.White,
                 )
             }
