@@ -36,9 +36,10 @@ class FractalAsyncViewer(
 
     private var updateImageJob: Job? = null
     private var onImageUpdated: ((Bitmap) -> Unit)? = null
-    private var onProgressUpdate: ((Float) -> Unit)? = null
+    private var onProgressUpdate: ((Float, Long) -> Unit)? = null
     private var iterationsCountForProgress: Long = 0
     private var currentIterationsCount: Long = 0
+    private var startTime = 0L
 
     private var gradient = GradientFractalysis
 
@@ -55,14 +56,15 @@ class FractalAsyncViewer(
         updateImage()
     }
 
-    fun onProgressUpdate(callback: ((Float) -> Unit)?) {
+    fun onProgressUpdate(callback: ((Float, Long) -> Unit)?) {
         onProgressUpdate = callback
     }
 
-    private fun updateProgress() {
+    private fun updateProgress(time: Long) {
         currentIterationsCount += 1
         onProgressUpdate?.invoke(
-            (currentIterationsCount / iterationsCountForProgress.toFloat() * 10000).toInt() / 100F
+            (currentIterationsCount / iterationsCountForProgress.toFloat() * 10000).toInt() / 100F,
+            time,
         )
     }
 
@@ -79,7 +81,7 @@ class FractalAsyncViewer(
             val canvas = Canvas(fractal)
             val paint = Paint()
 
-            val startTime = System.currentTimeMillis()
+            startTime = System.currentTimeMillis()
             for (level in sectorIterations downTo 1) {
                 drawLevel(canvas, paint, 2.0.pow(level).toInt())
                 fractalOutput = fractal.copy(Bitmap.Config.ARGB_8888, false)
@@ -116,7 +118,7 @@ class FractalAsyncViewer(
                     paint,
                 )
             }
-            withUI { updateProgress() }
+            withUI { updateProgress(System.currentTimeMillis() - startTime) }
         }
     }
 
