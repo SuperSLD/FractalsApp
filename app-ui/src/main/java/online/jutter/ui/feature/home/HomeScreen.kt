@@ -1,6 +1,10 @@
 package online.jutter.ui.feature.home
 
+import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -38,9 +41,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +54,6 @@ import online.jutter.ui.NavigationKeys
 import online.jutter.ui.common.composable.BottomSheet
 import online.jutter.ui.common.composable.RadialGradientPreview
 import online.jutter.ui.common.composable.fractal.Fractal
-import online.jutter.ui.common.composable.fractal.Gradient
 import online.jutter.ui.common.composable.fractal.GradientBlue
 import online.jutter.ui.common.composable.fractal.GradientBlueGreen
 import online.jutter.ui.common.composable.fractal.GradientBlueRedGreen
@@ -60,6 +64,7 @@ import online.jutter.ui.theme.Background
 import online.jutter.ui.theme.BackgroundSecondary
 import online.jutter.ui.theme.FractalsTheme
 import online.jutter.ui.theme.TextGray
+
 
 @ExperimentalMaterial3Api
 @Composable
@@ -112,6 +117,8 @@ fun HomeScreen(
             )
         )
     }
+
+    val context = LocalContext.current
 
     Scaffold { innerPadding ->
         Modifier.padding(innerPadding)
@@ -245,6 +252,9 @@ fun HomeScreen(
                                 colors = CardDefaults.cardColors(
                                     containerColor = Background,
                                 ),
+                                onClick = {
+                                    sharePalette(context, fractalBitmap!!)
+                                }
                             ) {
                                 Box(
                                     contentAlignment = Alignment.Center,
@@ -309,6 +319,20 @@ fun HomeScreen(
             }
         }
     }
+}
+
+private fun sharePalette(context: Context, bitmap: Bitmap) {
+    val bitmapPath = MediaStore.Images.Media.insertImage(
+        context.contentResolver,
+        bitmap,
+        "Fractal",
+        "generated in Fractal App"
+    )
+    val bitmapUri = Uri.parse(bitmapPath)
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "image/png"
+    intent.putExtra(Intent.EXTRA_STREAM, bitmapUri)
+    context.startActivity(Intent.createChooser(intent, "Share"))
 }
 
 @Composable
