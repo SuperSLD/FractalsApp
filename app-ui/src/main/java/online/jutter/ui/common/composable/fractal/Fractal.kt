@@ -22,13 +22,25 @@ import online.jutter.ui.common.composable.BitmapImage
 import online.jutter.ui.ext.logDebug
 import online.jutter.ui.theme.FractalsTheme
 
+// Начальная позиция
+// [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
+// Позиция максимального зума (до фиксов)
+// [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
+// Красивая загагулина
+// [x: -0.2343347114572282, y: 0.8271799783391012, scale: 1.482389478882432E-9]
+
 @Composable
 fun Fractal(
     centerX: Double = -0.4857724165499294,
     centerY: Double = -0.04209991654388896,
     fractalScale: Double = 0.002696652170084606,
+//    centerX: Double = -0.2343347114572282,
+//    centerY: Double = 0.8271799783391012,
+//    fractalScale: Double = 1.482389478882432E-9,
     gradient: Gradient = GradientBlueGreen,
-    onProgressUpdate: ((Float, Long, Long) -> Unit)? = null
+    onPositionUpdate: ((Double, Double, Double) -> Unit)? = null,
+    onProgressUpdate: ((Float, Long, Long) -> Unit)? = null,
+    onBitmapChanged: ((Bitmap)->Unit)? = null,
 ) {
 
     var fractalBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -67,11 +79,12 @@ fun Fractal(
                         onImageUpdated {
                             transition = false
                             fractalBitmap = it
+                            onBitmapChanged?.invoke(it)
                         }
+                        onPositionUpdate?.let { onPositionUpdate(it) }
                         updateImage()
                     }
                 }
-
             }
             .transformable(state = state)
             .fillMaxSize()

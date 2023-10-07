@@ -25,6 +25,11 @@ class FractalAsyncViewer(
     private var gradient: Gradient,
 ) {
 
+    companion object {
+        private var updateImageJob: Job? = null
+
+    }
+
     private var fractal = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     private var fractalOutput = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     //private var fractalFunction = (, x)
@@ -34,17 +39,10 @@ class FractalAsyncViewer(
 
     private val runtime = Runtime.getRuntime()
 
-    // Начальная позиция
-    // [x: -0.4857724165499294, y: -0.04209991654388896, scale: 0.002696652170084606]
-    // Позиция максимального зума (до фиксов)
-    // [x: -1.7596913735842183, y: -0.013188483709530576, scale: 8.095181873089536E-18]
-    // Красивая загагулина
-    // [x: -0.2343347114572282, y: 0.8271799783391012, scale: 1.482389478882432E-9]
 
-
-    private var updateImageJob: Job? = null
     private var onImageUpdated: ((Bitmap) -> Unit)? = null
     private var onProgressUpdate: ((Float, Long, Long) -> Unit)? = null
+    private var onPositionUpdate: ((Double, Double, Double)->Unit)? = null
     private var iterationsCountForProgress: Long = 0
     private var currentIterationsCount: Long = 0
     private var startTime = 0L
@@ -63,7 +61,12 @@ class FractalAsyncViewer(
         scale /= zoomChange.toDouble()
         centerX -= offsetChange.x.toDouble() * scale
         centerY -= offsetChange.y.toDouble() * scale
+        onPositionUpdate?.invoke(centerX, centerY, scale)
         updateImage()
+    }
+
+    fun onPositionUpdate(listener: (Double, Double, Double)->Unit) {
+        onPositionUpdate = listener
     }
 
     fun onProgressUpdate(callback: ((Float, Long, Long) -> Unit)?) {
