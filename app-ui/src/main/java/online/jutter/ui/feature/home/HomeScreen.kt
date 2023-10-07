@@ -154,6 +154,7 @@ fun HomeScreen(
                             ) {
                                 RadialGradientPreview(
                                     gradient = it,
+                                    iterations = 40,
                                     modifier = Modifier
                                         .width(64.dp)
                                         .height(64.dp)
