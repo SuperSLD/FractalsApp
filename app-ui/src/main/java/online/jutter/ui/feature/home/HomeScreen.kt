@@ -1,10 +1,24 @@
 package online.jutter.ui.feature.home
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,11 +33,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import online.jutter.ui.NavigationKeys
+import online.jutter.ui.common.composable.RadialGradientPreview
 import online.jutter.ui.common.composable.fractal.Fractal
+import online.jutter.ui.common.composable.fractal.GradientBlueGreen
+import online.jutter.ui.theme.Background
 import online.jutter.ui.theme.FractalsTheme
+
+val currentGradient = GradientBlueGreen
 
 @Composable
 fun HomeScreenDestination(navController: NavHostController) {
@@ -44,6 +64,11 @@ fun HomeScreen(
     onNavigationRequested: () -> Unit
 ) {
 
+    val systemUiController = rememberSystemUiController()
+    systemUiController.setSystemBarsColor(
+        color = Color.Transparent
+    )
+
     var progress by remember {
         mutableFloatStateOf(0F)
     }
@@ -61,19 +86,119 @@ fun HomeScreen(
         if (state.isLoading) {
             LoadingBar()
         } else {
-            Fractal(onProgressUpdate = { p, t, i ->
-                progress = p
-                time = t
-                iterations = i
-            })
+            Fractal(
+                gradient = currentGradient,
+                onProgressUpdate = { p, t, i ->
+                    progress = p
+                    time = t
+                    iterations = i
+                }
+            )
             Box(
-                modifier = Modifier.fillMaxSize()
-                    .padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .statusBarsPadding()
+                    .navigationBarsPadding(),
             ) {
-                Text(
-                    text = "Loading: $progress%, ${time/1000} sec. ${time % 1000} ms, iter $iterations",
-                    color = Color.White,
-                )
+                Column(
+                    verticalArrangement = Arrangement.Bottom,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Card(
+                            modifier = Modifier
+                                .width(48.dp)
+                                .height(48.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = Background,
+                            ),
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxSize(),
+                            ) {
+                                RadialGradientPreview(
+                                    gradient = currentGradient,
+                                    modifier = Modifier
+                                        .width(36.dp)
+                                        .height(36.dp),
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.weight(1F))
+                        AnimatedVisibility(visible = progress == 100F) {
+                            Card(
+                                modifier = Modifier
+                                    .width(48.dp)
+                                    .height(48.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = Background,
+                                ),
+                            ) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.fillMaxSize(),
+                                ) {
+                                    Icon(
+                                        Icons.Default.Share,
+                                        contentDescription = null,
+                                        tint = currentGradient.accent(),
+                                    )
+                                }
+                            }
+                        }
+                        AnimatedVisibility(visible = progress < 100F) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Card(
+                                    modifier = Modifier
+                                        .width(78.dp)
+                                        .height(48.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Background,
+                                    ),
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize(),
+                                    ) {
+                                        Text(
+                                            text = "$progress%",
+                                            color = Color.White,
+                                            //modifier = Modifier.fillMaxSize(),
+                                            //textAlign = TextAlign.,
+                                        )
+                                    }
+                                }
+                                Card(
+                                    modifier = Modifier
+                                        .width(48.dp)
+                                        .height(48.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = Background,
+                                    ),
+                                ) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier.fillMaxSize(),
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier
+                                                .width(24.dp)
+                                                .height(24.dp),
+                                            color = currentGradient.accent(),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -99,14 +224,14 @@ fun DefaultPreview() {
     }
 }
 
-
-@Preview(
-    showBackground = true,
-    uiMode = UI_MODE_NIGHT_YES
-)
-@Composable
-fun DarkDefaultPreview() {
-    FractalsTheme {
-        HomeScreen(HomeContract.State(), null, { })
-    }
-}
+//
+//@Preview(
+//    showBackground = true,
+//    uiMode = UI_MODE_NIGHT_YES
+//)
+//@Composable
+//fun DarkDefaultPreview() {
+//    FractalsTheme {
+//        HomeScreen(HomeContract.State(), null, { })
+//    }
+//}

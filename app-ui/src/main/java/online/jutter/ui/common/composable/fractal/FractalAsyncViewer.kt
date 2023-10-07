@@ -18,11 +18,11 @@ class FractalAsyncViewer(
     private val width: Int,
     private val height: Int,
 
-    private var centerX: Double = -0.4857724165499294,
-    private var centerY: Double = -0.04209991654388896,
-    private var scale: Double = 0.002696652170084606,
+    private var centerX: Double,
+    private var centerY: Double,
+    private var scale: Double,
 
-    private var gradient: Gradient = GradientBlueGreen,
+    private var gradient: Gradient,
 ) {
 
     private var fractal = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)

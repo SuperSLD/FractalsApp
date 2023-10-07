@@ -9,6 +9,28 @@ data class Gradient(
     val colors: List<RgbColor>
 ) {
 
+    private val accentColor: RgbColor
+
+    init {
+        var r = 0F
+        var g = 0F
+        var b = 0F
+        var count = 0
+        colors.forEach { color ->
+            if (!color.isMonotone()) {
+                r += color.r
+                g += color.g
+                b += color.b
+                count++
+            }
+        }
+        accentColor = if (count == 0) {
+            RgbColor(1F, 1F, 1F)
+        } else {
+            RgbColor(r / count, g / count, b / count)
+        }
+    }
+
     /**
      * Получение цвета в соответствии с интенсивностью точки на экране.
      */
@@ -23,6 +45,13 @@ data class Gradient(
 
         return Color.argb(1F, resultRed, resultGreen, resultBlue)
     }
+
+    /**
+     * Получение акцентного цвета градиента.
+     */
+    fun accent() = with(accentColor) {
+        androidx.compose.ui.graphics.Color(r, g, b, 1F)
+    }
 }
 
 /**
@@ -34,6 +63,12 @@ data class RgbColor(
     val b: Float,
 ) {
     constructor(r: Int, g: Int, b: Int) : this(r/255F, g/255F, b/255F)
+
+    fun isWhite() = r == 1F && g == 1F && b == 1F
+
+    fun isBlack() = r == 0F && g == 0F && b == 0F
+
+    fun isMonotone() = r == g && g == b
 }
 
 val GradientBlue = Gradient(
@@ -96,6 +131,14 @@ val GradientRainbow = Gradient(
         RgbColor(0, 0, 255),
         RgbColor(0, 255, 255),
         RgbColor(255, 150, 0),
+        RgbColor(0, 0, 0),
+    )
+)
+
+val GradientMonotoneBlack = Gradient(
+    listOf(
+        RgbColor(0, 0, 0),
+        RgbColor(255, 255, 255),
         RgbColor(0, 0, 0),
     )
 )

@@ -24,12 +24,14 @@ import online.jutter.ui.theme.FractalsTheme
 
 @Composable
 fun Fractal(
-    iterations: Int = 100,
+    centerX: Double = -0.4857724165499294,
+    centerY: Double = -0.04209991654388896,
+    fractalScale: Double = 0.002696652170084606,
+    gradient: Gradient = GradientBlueGreen,
     onProgressUpdate: ((Float, Long, Long) -> Unit)? = null
 ) {
 
     var fractalBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var lastFractalBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var fractalAsyncViewer by remember { mutableStateOf<FractalAsyncViewer?>(null) }
     var composableIsPositioned by remember { mutableStateOf(false) }
 
@@ -39,7 +41,6 @@ fun Fractal(
     val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
         if (!transition) {
             transition = true
-            //lastFractalBitmap = fractalBitmap?.copy(Bitmap.Config.ARGB_8888, false)
             offset = Offset(0F, 0F)
             scale = 1f
         }
@@ -55,7 +56,12 @@ fun Fractal(
                 if (!composableIsPositioned) {
                     composableIsPositioned = true
                     fractalAsyncViewer = FractalAsyncViewer(
-                        coordinates.size.width, coordinates.size.height,
+                        width = coordinates.size.width,
+                        height = coordinates.size.height,
+                        centerX = centerX,
+                        centerY = centerY,
+                        scale = fractalScale,
+                        gradient = gradient,
                     ).apply {
                         onProgressUpdate(onProgressUpdate)
                         onImageUpdated {

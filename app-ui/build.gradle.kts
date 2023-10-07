@@ -80,4 +80,6 @@ dependencies {
     implementation("org.koin:koin-android:2.1.6")
 
     implementation(project(":app-domain"))
+
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
 }

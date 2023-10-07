@@ -49,7 +49,7 @@ fun GradientPreview(
 
 @Preview
 @Composable
-fun DefaultPreview() {
+fun GradientDebugPreview() {
     FractalsTheme {
         Column(
             modifier = Modifier.padding(24.dp),
