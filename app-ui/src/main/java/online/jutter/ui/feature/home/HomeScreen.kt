@@ -52,6 +52,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import online.jutter.ui.NavigationKeys
 import online.jutter.ui.common.composable.BottomSheet
+import online.jutter.ui.common.composable.DefaultCard
 import online.jutter.ui.common.composable.RadialGradientPreview
 import online.jutter.ui.common.composable.fractal.Fractal
 import online.jutter.ui.common.composable.fractal.GradientBlue
@@ -60,6 +61,7 @@ import online.jutter.ui.common.composable.fractal.GradientBlueRedGreen
 import online.jutter.ui.common.composable.fractal.GradientDeepSpace
 import online.jutter.ui.common.composable.fractal.GradientFractalysis
 import online.jutter.ui.common.composable.fractal.GradientMonotoneBlack
+import online.jutter.ui.feature.home.composables.GradientCardItem
 import online.jutter.ui.theme.Background
 import online.jutter.ui.theme.BackgroundSecondary
 import online.jutter.ui.theme.FractalsTheme
@@ -132,50 +134,10 @@ fun HomeScreen(
                         .padding(24.dp),
                 ) {
                     items(gradientList) {
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = BackgroundSecondary,
-                            ),
-                            elevation = CardDefaults.cardElevation(
-                                defaultElevation = 8.dp
-                            ),
-                            onClick = {
-                                gradient = it
-                                showSheet = false
-                            }
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                            ) {
-                                RadialGradientPreview(
-                                    gradient = it,
-                                    iterations = 40,
-                                    modifier = Modifier
-                                        .width(64.dp)
-                                        .height(64.dp)
-                                )
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier.fillMaxSize(),
-                                ) {
-                                    Text(
-                                        text = it.name,
-                                        color = Color.White,
-                                        fontSize = 20.sp
-                                    )
-                                    Text(
-                                        text = "Color count: ${it.colors.size}",
-                                        color = TextGray,
-                                        fontSize = 16.sp
-                                    )
-                                }
-                            }
-                        }
+                        GradientCardItem(gradient = it, onGradientSelected = {
+                            showSheet = false
+                            gradient = it
+                        })
                     }
                 }
             }
@@ -221,97 +183,61 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Card(
+                        DefaultCard(
                             modifier = Modifier
                                 .width(48.dp)
                                 .height(48.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Background,
-                            ),
-                            onClick = {
-                                showSheet = true
-                            },
+                            onClick = { showSheet = true },
                         ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.fillMaxSize(),
-                            ) {
-                                RadialGradientPreview(
-                                    gradient = gradient,
-                                    modifier = Modifier
-                                        .width(36.dp)
-                                        .height(36.dp),
-                                )
-                            }
+                            RadialGradientPreview(
+                                gradient = gradient,
+                                modifier = Modifier
+                                    .width(36.dp)
+                                    .height(36.dp),
+                            )
                         }
                         Spacer(modifier = Modifier.weight(1F))
                         AnimatedVisibility(visible = progress == 100F) {
-                            Card(
+                            DefaultCard(
                                 modifier = Modifier
                                     .width(48.dp)
                                     .height(48.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = Background,
-                                ),
-                                onClick = {
-                                    sharePalette(context, fractalBitmap!!)
-                                }
+                                onClick = { sharePalette(context, fractalBitmap!!) }
                             ) {
-                                Box(
-                                    contentAlignment = Alignment.Center,
-                                    modifier = Modifier.fillMaxSize(),
-                                ) {
-                                    Icon(
-                                        Icons.Default.Share,
-                                        contentDescription = null,
-                                        tint = gradient.accent(),
-                                    )
-                                }
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = null,
+                                    tint = gradient.accent(),
+                                )
                             }
                         }
                         AnimatedVisibility(visible = progress < 100F) {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
-                                Card(
+                                DefaultCard(
                                     modifier = Modifier
                                         .width(78.dp)
                                         .height(48.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = Background,
-                                    ),
                                 ) {
-                                    Box(
-                                        contentAlignment = Alignment.Center,
-                                        modifier = Modifier.fillMaxSize(),
-                                    ) {
-                                        Text(
-                                            text = "$progress%",
-                                            color = Color.White,
-                                            //modifier = Modifier.fillMaxSize(),
-                                            //textAlign = TextAlign.,
-                                        )
-                                    }
+                                    Text(
+                                        text = "$progress%",
+                                        color = Color.White,
+                                        //modifier = Modifier.fillMaxSize(),
+                                        //textAlign = TextAlign.,
+                                    )
                                 }
-                                Card(
+                                DefaultCard(
                                     modifier = Modifier
                                         .width(48.dp)
                                         .height(48.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = Background,
-                                    ),
                                 ) {
-                                    Box(
-                                        contentAlignment = Alignment.Center,
-                                        modifier = Modifier.fillMaxSize(),
-                                    ) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier
-                                                .width(24.dp)
-                                                .height(24.dp),
-                                            color = gradient.accent(),
-                                        )
-                                    }
+                                    CircularProgressIndicator(
+                                        modifier = Modifier
+                                            .width(24.dp)
+                                            .height(24.dp),
+                                        color = gradient.accent(),
+                                    )
                                 }
                             }
                         }

@@ -2,10 +2,10 @@ package online.jutter.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Background = Color(0xFF0F1225)
-val BackgroundSecondary = Color(0xFF2C304E)
+val Background = Color(0xFF252525)
+val BackgroundSecondary = Color(0xFF2E2E2E)
 
-val TextGray = Color(0xFF474E7E)
+val TextGray = Color(0xFF6D6D6D)
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
